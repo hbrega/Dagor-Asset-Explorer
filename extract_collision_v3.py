@@ -438,16 +438,23 @@ def export_dmf(nodes, out, name):
     return p,len(buf.getvalue())
 
 def main():
-    grp=r"E:\Dagor Asset Explorer\grp\usa_aircraft_logic.grp"
-name = sys.argv[1] if len(sys.argv) > 1 else "a_4b_collision"
-out = r"E:\\Dagor Asset Explorer\\output"
-os.makedirs(out, exist_ok=True)
-entries = parse_grp(grp)
-t = next((e for e in entries if e["name"] == name), None)
-if not t:
-    print(f"'{name}' not found!")
-    sys.exit(1)
-
+    if len(sys.argv) < 2:
+        print("Usage: extract_collision_v3.py <resource_name> [grp_path]")
+        print("  If grp_path is omitted, defaults to uk_aircraft_logic.grp")
+        sys.exit(1)
+    name = sys.argv[1]
+    grp = sys.argv[2] if len(sys.argv) > 2 else r"E:\Dagor Asset Explorer\grp\uk_aircraft_logic.grp"
+    out = r"E:\Dagor Asset Explorer\output"
+    os.makedirs(out, exist_ok=True)
+    entries = parse_grp(grp)
+    if name == "--list":
+        for e in entries:
+            print(f"  {e['name']}  classId=0x{e['classId']:08X}  size={e['size']}")
+        sys.exit(0)
+    t = next((e for e in entries if e["name"] == name), None)
+    if not t:
+        print(f"'{name}' not found! Use --list to see available resources.")
+        sys.exit(1)
     with open(grp,'rb') as f: f.seek(t["offset"]); ad=f.read(t["size"])
     print(f"Parsing {name} ({len(ad)} bytes)...")
     nodes=parse_v3_collision(ad)
