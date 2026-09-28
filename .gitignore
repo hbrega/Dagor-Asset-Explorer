@@ -15,3 +15,5 @@ dist
 *.mvd
 /src/program.py
 /DagorAssetExplorer.exe
+/grp/
+*.grp
